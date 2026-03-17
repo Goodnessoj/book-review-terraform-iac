@@ -1,3 +1,4 @@
+# Web tier EC2 instance placed in the public subnet.
 resource "aws_instance" "web_server" {
   ami                    = data.aws_ami.ubuntu.id
   instance_type          = var.web_instance_type
@@ -12,6 +13,7 @@ resource "aws_instance" "web_server" {
   }
 }
 
+# App tier EC2 instance placed in the private subnet.
 resource "aws_instance" "app_server" {
   ami                    = data.aws_ami.ubuntu.id
   instance_type          = var.app_instance_type
@@ -26,11 +28,11 @@ resource "aws_instance" "app_server" {
   }
 }
 
-# Get AWS Account Information
+# Retrieves AWS account metadata for contextual use.
 data "aws_caller_identity" "current" {}
 
 
-# Ubuntu 22.04 AMI Data Sources
+# Resolves the latest Ubuntu 24.04 AMI for EC2 instances.
 data "aws_ami" "ubuntu" {
   most_recent = true
   owners      = ["099720109477"] # Canonical

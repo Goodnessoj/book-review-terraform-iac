@@ -1,7 +1,9 @@
+# Fetches available availability zones in the current region.
 data "aws_availability_zones" "azs" {
   state = "available"
 }
 
+# Creates the primary VPC for the application.
 resource "aws_vpc" "book-review-vpc" {
 
   cidr_block           = var.vpc_cidr_block
@@ -14,6 +16,7 @@ resource "aws_vpc" "book-review-vpc" {
 }
 
 
+# Public subnet for web tier in the first availability zone.
 resource "aws_subnet" "web_subnet_1" {
 
   vpc_id                  = aws_vpc.book-review-vpc.id
@@ -27,6 +30,7 @@ resource "aws_subnet" "web_subnet_1" {
 }
 
 
+# Public subnet for web tier in the second availability zone.
 resource "aws_subnet" "web_subnet_2" {
 
   vpc_id                  = aws_vpc.book-review-vpc.id
@@ -39,6 +43,7 @@ resource "aws_subnet" "web_subnet_2" {
   }
 }
 
+# Private subnet for app tier in the first availability zone.
 resource "aws_subnet" "app_subnet_1" {
   vpc_id            = aws_vpc.book-review-vpc.id
   availability_zone = data.aws_availability_zones.azs.names[0]
@@ -49,6 +54,7 @@ resource "aws_subnet" "app_subnet_1" {
   }
 }
 
+# Private subnet for app tier in the second availability zone.
 resource "aws_subnet" "app_subnet_2" {
   vpc_id            = aws_vpc.book-review-vpc.id
   availability_zone = data.aws_availability_zones.azs.names[1]
@@ -60,6 +66,7 @@ resource "aws_subnet" "app_subnet_2" {
 }
 
 
+# Private subnet for database tier in the first availability zone.
 resource "aws_subnet" "db_subnet_1" {
   vpc_id            = aws_vpc.book-review-vpc.id
   availability_zone = data.aws_availability_zones.azs.names[0]
@@ -70,6 +77,7 @@ resource "aws_subnet" "db_subnet_1" {
   }
 }
 
+# Private subnet for database tier in the second availability zone.
 resource "aws_subnet" "db_subnet_2" {
   vpc_id            = aws_vpc.book-review-vpc.id
   availability_zone = data.aws_availability_zones.azs.names[1]
@@ -80,6 +88,7 @@ resource "aws_subnet" "db_subnet_2" {
   }
 }
 
+# Internet gateway for public internet access from the VPC.
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.book-review-vpc.id
 
@@ -88,6 +97,7 @@ resource "aws_internet_gateway" "igw" {
   }
 }
 
+# Route table for public subnets with internet route.
 resource "aws_route_table" "public_rt" {
   vpc_id = aws_vpc.book-review-vpc.id
 
@@ -97,16 +107,19 @@ resource "aws_route_table" "public_rt" {
   }
 }
 
+# Associates the first web subnet with the public route table.
 resource "aws_route_table_association" "public_rt_assoc_1" {
   subnet_id      = aws_subnet.web_subnet_1.id
   route_table_id = aws_route_table.public_rt.id
 }
 
+# Associates the second web subnet with the public route table.
 resource "aws_route_table_association" "public_rt_assoc_2" {
   subnet_id      = aws_subnet.web_subnet_2.id
   route_table_id = aws_route_table.public_rt.id
 }
 
+# Elastic IP allocated for the NAT gateway.
 resource "aws_eip" "nat_eip" {
   domain = "vpc"
   depends_on = [
@@ -118,6 +131,7 @@ resource "aws_eip" "nat_eip" {
   }
 }
 
+# NAT gateway enabling outbound internet for private subnets.
 resource "aws_nat_gateway" "nat_gw" {
   allocation_id = aws_eip.nat_eip.id
   subnet_id     = aws_subnet.web_subnet_1.id
@@ -127,6 +141,7 @@ resource "aws_nat_gateway" "nat_gw" {
   }
 }
 
+# Route table for private subnets with NAT-based internet access.
 resource "aws_route_table" "private_rt" {
   vpc_id = aws_vpc.book-review-vpc.id
 
@@ -136,18 +151,22 @@ resource "aws_route_table" "private_rt" {
   }
 }
 
+# Associates first app subnet with the private route table.
 resource "aws_route_table_association" "private_rt_assoc_1" {
   subnet_id      = aws_subnet.app_subnet_1.id
   route_table_id = aws_route_table.private_rt.id
 }
+# Associates second app subnet with the private route table.
 resource "aws_route_table_association" "private_rt_assoc_2" {
   subnet_id      = aws_subnet.app_subnet_2.id
   route_table_id = aws_route_table.private_rt.id
 }
+# Associates first database subnet with the private route table.
 resource "aws_route_table_association" "private_rt_assoc_3" {
   subnet_id      = aws_subnet.db_subnet_1.id
   route_table_id = aws_route_table.private_rt.id
 }
+# Associates second database subnet with the private route table.
 resource "aws_route_table_association" "private_rt_assoc_4" {
   subnet_id      = aws_subnet.db_subnet_2.id
   route_table_id = aws_route_table.private_rt.id

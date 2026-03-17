@@ -1,3 +1,4 @@
+# Managed RDS instance for the book review application.
 resource "aws_db_instance" "book_review_db" {
   identifier       = "book-review-db"
   allocated_storage    = var.allocated_storage
@@ -13,6 +14,7 @@ resource "aws_db_instance" "book_review_db" {
   db_subnet_group_name   = aws_db_subnet_group.book_review_db_subnet_group.id
 }
 
+# Subnet group containing private database subnets for RDS.
 resource "aws_db_subnet_group" "book_review_db_subnet_group" {
   name       = "book-review-db-subnet-group"
   subnet_ids = [var.db_subnet_1_id, var.db_subnet_2_id]

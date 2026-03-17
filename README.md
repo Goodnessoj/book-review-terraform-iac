@@ -4,24 +4,14 @@ This repository contains a complete Terraform scaffold for deploying a three-tie
 
 ## Architecture Overview
 
-```
-External Users
-    ↓
-Public ALB (Port 80)
-    ↓
-Web Servers (EC2)
-    ↓
-Internal ALB (Port 3001)
-    ↓
-App Servers (EC2)
-    ↓
-RDS Database (MySQL)
-```
+![Architectural Diagram](assets/architetural-diagram.jpeg)
+
+
 
 ## Project Structure
 
 ```
-tera/
+book-review-terraform-Iac/
 ├── main.tf                 # Root module configuration - orchestrates all modules
 ├── variables.tf            # Root-level variable definitions
 ├── outputs.tf              # Root-level outputs (VPC, instance IDs, endpoints)
@@ -215,8 +205,8 @@ aws configure
 ### Step 1: Create SSH Key Pair
 ```bash
 # Create key pair in AWS (saves to .pem file)
-aws ec2 create-key-pair --key-name my-app-key --query 'KeyMaterial' --output text > my-app-key.pem
-chmod 400 my-app-key.pem
+aws ec2 create-key-pair --key-name <key name> --region <region> --query 'KeyMaterial' --output text > keyname.pem
+chmod 400 keyname.pem
 ```
 
 ### Step 2: Configure Variables

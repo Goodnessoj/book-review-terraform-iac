@@ -9,3 +9,11 @@ output "appserver_prvt_ip" {
 output "db_endpoint" {
   value = module.database.db_endpoint
 }
+
+output "public_alb_dns_name" {
+  value = module.alb.public_alb_dns_name
+}
+
+output "private_alb_dns_name" {
+  value = module.alb.private_alb_dns_name
+}
